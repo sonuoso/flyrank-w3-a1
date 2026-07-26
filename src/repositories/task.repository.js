@@ -1,13 +1,5 @@
 const db = require("../db");
 
-const tasks = [
-  { id: 1, title: "Check dry good par levels", done: 1 },
-  { id: 2, title: "Inspect fresh food stock", done: 1 },
-  { id: 3, title: "Order fresh produce", done: 0 },
-];
-
-let nextId = Math.max(...tasks.map((t) => t.id)) + 1;
-
 function getAll() {
   const tasks = db.prepare(`SELECT * FROM tasks`).all();
   const returnTasks = tasks.map((t) => ({
@@ -40,26 +32,23 @@ function create(title) {
 }
 
 function update(id, changes) {
-  const taskIndex = tasks.findIndex((t) => t.id === id);
-  if (taskIndex !== -1) {
+  const updateTitle = db.prepare(`UPDATE tasks SET title = :value WHERE id = :id`);
+  const updateDone = db.prepare(`UPDATE tasks SET done = :value WHERE id = :id`);
+
     if (changes.title !== undefined) {
-      tasks[taskIndex].title = changes.title;
+      updateTitle.run({value: changes.title, id: id });
     }
 
     if (changes.done !== undefined) {
-      tasks[taskIndex].done = changes.done;
+      updateDone.run({value: changes.done === true ? 1 : 0, id: id });
     }
 
-    return tasks[taskIndex];
-  } else {
-    return undefined;
-  }
+    return getById(id);
 }
 
 function remove(id) {
-  const taskIndex = tasks.findIndex((t) => t.id === id);
-  if (taskIndex !== -1) {
-    tasks.splice(taskIndex, 1);
+  const { changes } = db.prepare(`DELETE FROM tasks where id = ?`).run(id);
+  if (changes === 1) {
     return true;
   } else {
     return false;
