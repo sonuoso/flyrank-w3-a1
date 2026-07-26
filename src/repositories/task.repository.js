@@ -28,9 +28,15 @@ function getById(id) {
 }
 
 function create(title) {
-  const newTask = { id: nextId++, title: title, done: false };
-  tasks.push(newTask);
-  return newTask;
+  const newTask = { title: title, done: 0 };
+
+  const { lastInsertRowid } = db
+    .prepare(`INSERT INTO tasks (title, done) VALUES (:title, :done)`)
+    .run(newTask);
+
+  const returnTask = { id: lastInsertRowid, title: title, done: false };
+
+  return returnTask;
 }
 
 function update(id, changes) {
