@@ -1,17 +1,29 @@
-let tasks = [
-  { id: 1, title: "Check dry good par levels", done: true },
-  { id: 2, title: "Inspect fresh food stock", done: true },
-  { id: 3, title: "Order fresh produce", done: false },
+const db = require("../db");
+
+const tasks = [
+  { id: 1, title: "Check dry good par levels", done: 1 },
+  { id: 2, title: "Inspect fresh food stock", done: 1 },
+  { id: 3, title: "Order fresh produce", done: 0 },
 ];
 
 let nextId = Math.max(...tasks.map((t) => t.id)) + 1;
 
 function getAll() {
-  return tasks;
+  const tasks = db.prepare(`SELECT * FROM tasks`).all();
+  const returnTasks = tasks.map((t) => ({
+    id: t.id,
+    title: t.title,
+    done: Boolean(t.done),
+  }));
+  return returnTasks;
 }
 
 function getById(id) {
-  const task = tasks.find((t) => t.id === id);
+  const task = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id);
+  if (task !== undefined) {
+    task.done = Boolean(task.done);
+  }
+
   return task;
 }
 
