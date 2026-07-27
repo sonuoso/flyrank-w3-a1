@@ -182,12 +182,14 @@ In the CRUD application built with Express in W2 A1, it used an in-memory array 
 
 SQLite requires only a single file for the database with no explicit server setup/install and is ideal for data management of a project of this scale.
 
-All task data is stored in **tasks.db** in the root of the repository and it uses a single table to manage data. The tasks.db is also listed in .gitignore so that anyone who clones this repository on GitHub gets a fresh tasks.db automatically created with seed data without any extra manual configuration upon the initial run.
+All task data is stored in **tasks.db** in the root of the repository and it uses a single table to manage data. 
 
 - Table: **tasks**
 - Fields: **id** (integer primary key autoincrement), **title** (text not null), **done** (integer not null default 0)
 
 (Since SQLite doesn't store Boolean values in its database, it uses `1` for `true` and `0` for `false` as values for done. When data is fetched from the tasks.db and displayed through the API, done values are changed to `true` and `false` in the repository layer for proper interpretation.)
+
+The tasks.db is listed in .gitignore so that anyone who clones this repository on GitHub and runs the `npm start` command gets a fresh tasks.db automatically created with seed data without any extra manual configuration upon the initial run.
 
 ### Exploring SQLite (Stage 4)
 I ran the SQL query below in DB Browser for SQLite on tasks.db:
