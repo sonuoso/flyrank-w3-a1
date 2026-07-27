@@ -69,7 +69,7 @@ Once the server is running, visit `http://localhost:3000/docs`. It will show all
 ## The Mortality Experiment
 A new task with `{ title: "Check produce crates" }` created using `POST` returned the new task with the automatically assigned `id = 4` but when the server restarted and called `GET` on all tasks, it only had 3 tasks with the maximum id value being 3. Since tasks are saved to an in-memory array on the running server and upon restart, tasks array is reverted to its default values discarding changes.
 
-## AI vs Me
+## AI vs Me (W2 A1)
 
 ### Prompt
 ```
@@ -175,3 +175,26 @@ In the rematch prompt I noticed the raw openapi.json file being presented throug
 
 ### Rematch
 In the rematch prompt I explicitly stated both "done invalid" and "done invalid with title present" as separate conditions and it generated distinct error messages reflecting the encountered issues rather than using identical "done invalid" error for both cases.
+
+## W3 A1 - Connecting to the database
+### SQLite Migration
+In the CRUD application built with Express in W2 A1, it used an in-memory array to handle the task data. Now the in-memory array has been swapped to a SQLite database in W3 A1 that properly stores task data and allows data retrieval and manipulation with SQL eliminating the data loss that happened upon every server restart.
+
+SQLite requires only a single file for the database with no explicit server setup/install and is ideal for data management of a project of this scale.
+
+All task data is stored in **tasks.db** in the root of the repository and it uses a single table to manage data. The tasks.db is also listed in .gitignore so that anyone who clones this repository on GitHub gets a fresh tasks.db automatically created with seed data without any extra manual configuration upon the initial run.
+
+- Table: **tasks**
+- Fields: **id** (integer primary key autoincrement), **title** (text not null), **done** (integer not null default 0)
+
+(Since SQLite doesn't store Boolean values in its database, it uses `1` for `true` and `0` for `false` as values for done. When data is fetched from the tasks.db and displayed through the API, done values are changed to `true` and `false` in the repository layer for proper interpretation.)
+
+### Exploring SQLite (Stage 4)
+I ran the SQL query below in DB Browser for SQLite on tasks.db:
+
+```sql
+UPDATE tasks SET done = 1;
+```
+This changed the done field's value to 1 in all three tasks rendering all three tasks as completed. Afterwards I called `GET /tasks` with no server restart and it reflected the same changes made in DB Viewer through the API.
+
+![tasks.db view in DB Browser for SQLite](./tasks_db.png)
